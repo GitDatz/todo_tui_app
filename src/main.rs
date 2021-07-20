@@ -1,3 +1,4 @@
+use chrono::{ Datelike, Utc };
 use std::io;
 use tui::{
     backend::CrosstermBackend,
@@ -36,11 +37,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Block::default()
                         .borders(Borders::ALL)
                         .style(Style::default().fg(Color::White))
-                        .title(" todo-tui-app ")
+                        .title(get_current_date())
                         .border_type(BorderType::Plain),
                 );
 
             rect.render_widget(description, chunks[0]);
         })?;
     }
+}
+
+fn get_current_date() -> String {
+    let now = Utc::now();
+    let date = format!(" {:04}-{:02}-{:02} ", now.year(), now.month(), now.day());
+    date
 }
