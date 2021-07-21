@@ -1,5 +1,12 @@
 use chrono::{ Datelike, Utc };
+use crossterm::{
+    event::{ self, Event as CtEvent, KeyCode },
+    terminal::{ disable_raw_mode, enable_raw_mode }
+};
 use std::io;
+use std::sync::mpsc;
+use std::thread;
+use std::time::{ Duration, Instant };
 use tui::{
     backend::CrosstermBackend,
     layout::{ Alignment, Constraint, Direction, Layout },
@@ -9,7 +16,37 @@ use tui::{
     Terminal,
 };
 
+enum Event<I> {
+    Press(I),
+    Tick,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    enable_raw_mode().expect("enable raw mode");
+
+    let (tx, rx) = mpsc::channel();
+    let tick_rate = Duration::from_millis(200);
+    thread::spawn(move || {
+        let mut last_tick = Instant::now();
+        loop {
+            let timeout = tick_rate
+                .checked_sub(last_tick.elapsed())
+                .unwrap_or_else(|| Duration::from_secs(0));
+
+            if event::poll(timeout).expect("polling") {
+                if let CtEvent::Key(key) = event::read().expect("reading CtEvent") {
+                    tx.send(Event::Press(key)).expect("sending Event::Press");
+                }
+            }
+
+            if last_tick.elapsed() >= tick_rate {
+                if let Ok(_) = tx.send(Event::Tick) {
+                    last_tick = Instant::now();
+                }
+            }
+        }
+    });
+
     let stdout = io::stdout();
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
@@ -70,7 +107,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             rect.render_widget(tabs, chunks[2]);
         })?;
+
+        match rx.recv()? {
+            Event::Press(event) => match event.code {
+                KeyCode::Char('q') => {
+                    disable_raw_mode()?;
+                    terminal.show_cursor()?;
+                    break;
+                }
+                _ => {}
+            },
+            Event::Tick => {}
+        }
     }
+    Ok(())
 }
 
 fn get_current_date() -> String {
