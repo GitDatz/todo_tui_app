@@ -3,8 +3,9 @@ use std::io;
 use tui::{
     backend::CrosstermBackend,
     layout::{ Alignment, Constraint, Direction, Layout },
-    style::{ Color, Style },
-    widgets::{ Block, BorderType, Borders, Paragraph },
+    style::{ Color, Modifier, Style },
+    text::{ Span, Spans },
+    widgets::{ Block, BorderType, Borders, Paragraph, Tabs },
     Terminal,
 };
 
@@ -13,6 +14,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
+
+    let menu_titles = vec!["Home", "Tasks", "Quit"];
 
     loop {
         terminal.draw(|rect| {
@@ -30,6 +33,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .split(size);
 
+            let menu = menu_titles
+                .iter()
+                .map(|t| {
+                    let (first, rest) = t.split_at(1);
+                    Spans::from(vec![
+                        Span::styled(
+                            first,
+                            Style::default()
+                                .fg(Color::Yellow)
+                                .add_modifier(Modifier::UNDERLINED),
+                        ),
+                        Span::styled(rest, Style::default().fg(Color::White)),
+                    ])
+                })
+                .collect();
+
             let description = Paragraph::new("TODO TUI - what to do today?")
                 .style(Style::default().fg(Color::LightCyan))
                 .alignment(Alignment::Center)
@@ -42,6 +61,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 );
 
             rect.render_widget(description, chunks[0]);
+
+            let tabs = Tabs::new(menu)
+            .block(Block::default().borders(Borders::ALL))
+            .style(Style::default().fg(Color::White))
+            .highlight_style(Style::default().fg(Color::Yellow))
+            .divider(Span::raw("|"));
+
+            rect.render_widget(tabs, chunks[2]);
         })?;
     }
 }
