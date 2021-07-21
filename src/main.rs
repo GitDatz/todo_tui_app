@@ -16,6 +16,8 @@ use tui::{
     Terminal,
 };
 
+#[path = "ui/pages.rs"] mod pages;
+
 enum Event<I> {
     Press(I),
     Tick,
@@ -106,6 +108,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .divider(Span::raw("|"));
 
             rect.render_widget(tabs, chunks[2]);
+
+            rect.render_widget(pages::render_home(), chunks[1]);
         })?;
 
         match rx.recv()? {
