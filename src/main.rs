@@ -12,11 +12,17 @@ use tui::{
     layout::{ Alignment, Constraint, Direction, Layout },
     style::{ Color, Modifier, Style },
     text::{ Span, Spans },
-    widgets::{ Block, BorderType, Borders, Paragraph, Tabs },
+    widgets::{ Block, BorderType, Borders, ListState, Paragraph, Tabs },
     Terminal,
 };
 
 #[path = "ui/pages.rs"] mod pages;
+
+#[derive(Copy, Clone, Debug)]
+enum Page {
+    Home,
+    Tasks,
+}
 
 enum Event<I> {
     Press(I),
@@ -55,6 +61,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     terminal.clear()?;
 
     let menu_titles = vec!["Home", "Tasks", "Quit"];
+    let mut current_page = Page::Home;
+    let mut task_list_state = ListState::default();
+    task_list_state.select(Some(0));
 
     loop {
         terminal.draw(|rect| {
@@ -110,6 +119,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             rect.render_widget(tabs, chunks[2]);
 
             rect.render_widget(pages::render_home(), chunks[1]);
+
+            match current_page {
+                Page::Home => rect.render_widget(pages::render_home(), chunks[1]),
+                Page::Tasks => {
+                let tasks_chunks = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(
+                        [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+                    )
+                    .split(chunks[1]);
+                let left = pages::render_tasks(&task_list_state);
+                rect.render_stateful_widget(left, tasks_chunks[0], &mut task_list_state);
+                }
+            }
         })?;
 
         match rx.recv()? {
@@ -119,6 +142,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     terminal.show_cursor()?;
                     break;
                 }
+                KeyCode::Char('h') => current_page = Page::Home,
+                KeyCode::Char('t') => current_page = Page::Tasks,
                 _ => {}
             },
             Event::Tick => {}
