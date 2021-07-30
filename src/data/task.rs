@@ -1,9 +1,9 @@
-use serde::{Deserialize, Serialize};
+use chrono::{ DateTime, Utc };
+use serde::{ Deserialize, Serialize };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Task {
-    id: usize,
-    name: String,
+    pub name: String,
     description: String,
     date_added: DateTime<Utc>
 }

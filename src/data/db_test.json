@@ -1,0 +1,17 @@
+[
+  {
+    "name":"Example Task 1",
+    "description":"Description of Example Task 1",
+    "date_added":"2021-08-01T12:00:00Z"
+  },
+  {
+    "name":"Example Task 2",
+    "description":"Description of Example Task 2",
+    "date_added":"2021-08-02T15:34:00Z"
+  },
+  {
+    "name":"Example Task 3",
+    "description":"Description of Example Task 3",
+    "date_added":"2021-08-03T05:43:00Z"
+  }
+]

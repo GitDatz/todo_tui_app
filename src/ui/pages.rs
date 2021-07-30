@@ -5,6 +5,8 @@ use tui::{
   widgets::{ Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Table },
 };
 
+use crate::data::task as data;
+
 pub fn render_home<'a>() -> Paragraph<'a> {
     let home = Paragraph::new(vec![
         Spans::from(vec![Span::raw("")]),
@@ -25,20 +27,18 @@ pub fn render_home<'a>() -> Paragraph<'a> {
     home
 }
 
-pub fn render_tasks<'a>(task_list_state: &ListState) -> List<'a> {
+pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>) -> List<'a> {
     let tasks = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
         .title(" Tasks ")
         .border_type(BorderType::Plain);
 
-    // TODO: read from a file instead of this list
-    let task_list = vec!["Task 1", "Task 2"];
     let items: Vec<_> = task_list
         .iter()
         .map(|task| {
             ListItem::new(Spans::from(vec![Span::styled(
-                "Task Name",
+                task.name.clone(),
                 Style::default(),
             )]))
         })

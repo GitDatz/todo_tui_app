@@ -3,8 +3,10 @@ use crossterm::{
     event::{ self, Event as CtEvent, KeyCode },
     terminal::{ disable_raw_mode, enable_raw_mode }
 };
+use std::fs;
 use std::io;
 use std::sync::mpsc;
+use thiserror::Error;
 use std::thread;
 use std::time::{ Duration, Instant };
 use tui::{
@@ -16,6 +18,17 @@ use tui::{
     Terminal,
 };
 
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("error reading the DB file: {0}")]
+    ReadDBError(#[from] io::Error),
+    #[error("error parsing the DB file: {0}")]
+    ParseDBError(#[from] serde_json::Error),
+}
+
+//#[path = "data/task.rs"] mod data;
+mod data;
+use data::task as model;
 #[path = "ui/pages.rs"] mod pages;
 
 #[derive(Copy, Clone, Debug)]
@@ -129,7 +142,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
                     )
                     .split(chunks[1]);
-                let left = pages::render_tasks(&task_list_state);
+                let left = pages::render_tasks(&task_list_state, read_test_db().expect("Could not parse database"));
                 rect.render_stateful_widget(left, tasks_chunks[0], &mut task_list_state);
                 }
             }
@@ -150,6 +163,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     Ok(())
+}
+
+fn read_test_db() -> Result<Vec<model::Task>, Error> {
+    let db_content = fs::read_to_string("src/data/db_test.json")?;
+    let parsed: Vec<model::Task> = serde_json::from_str(&db_content)?;
+    Ok(parsed)
 }
 
 fn get_current_date() -> String {
