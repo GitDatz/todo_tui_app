@@ -18,6 +18,11 @@ use tui::{
     Terminal,
 };
 
+mod data;
+use data::task as model;
+mod ui;
+use ui::pages as pages;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("error reading the DB file: {0}")]
@@ -25,11 +30,6 @@ pub enum Error {
     #[error("error parsing the DB file: {0}")]
     ParseDBError(#[from] serde_json::Error),
 }
-
-//#[path = "data/task.rs"] mod data;
-mod data;
-use data::task as model;
-#[path = "ui/pages.rs"] mod pages;
 
 #[derive(Copy, Clone, Debug)]
 enum Page {
@@ -124,26 +124,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             rect.render_widget(description, chunks[0]);
 
             let tabs = Tabs::new(menu)
-            .block(Block::default().borders(Borders::ALL))
-            .style(Style::default().fg(Color::White))
-            .highlight_style(Style::default().fg(Color::Yellow))
-            .divider(Span::raw("|"));
+                .block(Block::default().borders(Borders::ALL))
+                .style(Style::default().fg(Color::White))
+                .highlight_style(Style::default().fg(Color::Yellow))
+                .divider(Span::raw("|"));
 
             rect.render_widget(tabs, chunks[2]);
-
-            rect.render_widget(pages::render_home(), chunks[1]);
 
             match current_page {
                 Page::Home => rect.render_widget(pages::render_home(), chunks[1]),
                 Page::Tasks => {
-                let tasks_chunks = Layout::default()
-                    .direction(Direction::Horizontal)
-                    .constraints(
-                        [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
-                    )
-                    .split(chunks[1]);
-                let left = pages::render_tasks(&task_list_state, read_test_db().expect("Could not parse database"));
-                rect.render_stateful_widget(left, tasks_chunks[0], &mut task_list_state);
+                    let tasks_chunks = Layout::default()
+                        .direction(Direction::Horizontal)
+                        .constraints(
+                            [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+                        )
+                        .split(chunks[1]);
+                    let (left, right) = pages::render_tasks(&task_list_state, read_test_db().expect("Could not parse database"));
+                    rect.render_stateful_widget(left, tasks_chunks[0], &mut task_list_state);
+                    rect.render_widget(right, tasks_chunks[1]);
                 }
             }
         })?;
@@ -157,6 +156,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 KeyCode::Char('h') => current_page = Page::Home,
                 KeyCode::Char('t') => current_page = Page::Tasks,
+                KeyCode::Down => {
+                    if let Some(selected) = task_list_state.selected() {
+                        let nr_of_tasks = read_test_db().expect("can not fetch tasks list").len();
+                        if selected >= nr_of_tasks - 1 {
+                            task_list_state.select(Some(0));
+                        } else {
+                            task_list_state.select(Some(selected + 1));
+                        }
+                    }
+                }
+                KeyCode::Up => {
+                    if let Some(selected) = task_list_state.selected() {
+                        let nr_of_tasks = read_test_db().expect("can not fetch pet list").len();
+                        if selected > 0 {
+                            task_list_state.select(Some(selected - 1));
+                        } else {
+                            task_list_state.select(Some(nr_of_tasks - 1));
+                        }
+                    }
+                }
                 _ => {}
             },
             Event::Tick => {}

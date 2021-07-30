@@ -4,6 +4,6 @@ use serde::{ Deserialize, Serialize };
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Task {
     pub name: String,
-    description: String,
-    date_added: DateTime<Utc>
+    pub description: String,
+    pub date_added: DateTime<Utc>
 }

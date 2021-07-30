@@ -2,7 +2,7 @@ use tui::{
   layout::{ Alignment, Constraint },
   style::{ Color, Modifier, Style },
   text::{ Span, Spans },
-  widgets::{ Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Table },
+  widgets::{ Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table },
 };
 
 use crate::data::task as data;
@@ -27,7 +27,7 @@ pub fn render_home<'a>() -> Paragraph<'a> {
     home
 }
 
-pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>) -> List<'a> {
+pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>) -> (List<'a>, Table<'a>) {
     let tasks = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
@@ -50,5 +50,47 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
             .fg(Color::Black)
             .add_modifier(Modifier::BOLD),
     );
-    list
+
+    let selected_task = task_list
+        .get(
+            task_list_state
+                .selected()
+                .expect("no task selected!"),
+        )
+        .expect("exists")
+        .clone();
+
+    let task_detail = Table::new(vec![Row::new(vec![
+        Cell::from(Span::raw(selected_task.name)),
+        Cell::from(Span::raw(selected_task.description)),
+        Cell::from(Span::raw(selected_task.date_added.to_string())),
+        ])])
+        .header(Row::new(vec![
+            Cell::from(Span::styled(
+                "Name",
+                Style::default().add_modifier(Modifier::BOLD),
+            )),
+            Cell::from(Span::styled(
+                "Description",
+                Style::default().add_modifier(Modifier::BOLD),
+            )),
+            Cell::from(Span::styled(
+                "Created At",
+                Style::default().add_modifier(Modifier::BOLD),
+            )),
+        ]))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .title(" Details ")
+                .border_type(BorderType::Plain),
+        )
+        .widths(&[
+            Constraint::Percentage(30),
+            Constraint::Percentage(40),
+            Constraint::Percentage(10),
+        ]);
+
+    (list, task_detail)
 }
