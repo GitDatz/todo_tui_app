@@ -13,6 +13,7 @@ use tui::{
     Terminal,
 };
 
+use crate::constants;
 use crate::presenter;
 use crate::types;
 use crate::ui::pages as pages;
@@ -62,7 +63,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
               })
               .collect();
 
-          let description = Paragraph::new("TODO TUI - what to do today?")
+          let description = Paragraph::new(constants::APP_TITLE)
               .style(Style::default().fg(Color::LightCyan))
               .alignment(Alignment::Center)
               .block(
@@ -92,9 +93,9 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                           [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
                       )
                       .split(chunks[1]);
-                  let (left, right) = pages::render_tasks(&task_list_state, presenter::read_test_db().expect("Could not parse database"));
-                  rect.render_stateful_widget(left, tasks_chunks[0], &mut task_list_state);
-                  rect.render_widget(right, tasks_chunks[1]);
+                  let (side_bar, main_window) = pages::render_tasks(&task_list_state, presenter::read_test_db().expect("Could not parse database"));
+                  rect.render_stateful_widget(side_bar, tasks_chunks[0], &mut task_list_state);
+                  rect.render_widget(main_window, tasks_chunks[1]);
               }
           }
         })?;
@@ -102,7 +103,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
             types::Event::Press(event) => match event.code {
                 KeyCode::Char('q') => {
                     disable_raw_mode().expect("disable_raw_mode");
-                    terminal.show_cursor().expect("msg: &str");
+                    terminal.show_cursor().expect("terminal show_cursor()");
                     break;
                 }
                 KeyCode::Char('h') => current_page = types::Page::Home,
@@ -119,7 +120,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                 }
                 KeyCode::Up => {
                     if let Some(selected) = task_list_state.selected() {
-                        let nr_of_tasks = presenter::read_test_db().expect("can not fetch pet list").len();
+                        let nr_of_tasks = presenter::read_test_db().expect("can not fetch tasks list").len();
                         if selected > 0 {
                             task_list_state.select(Some(selected - 1));
                         } else {

@@ -6,6 +6,7 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::{ Duration, Instant };
 
+use crate::constants;
 use crate::data::task as model;
 use crate::types;
 use crate::ui;
@@ -38,7 +39,7 @@ pub fn presenter() {
 }
 
 pub fn read_test_db() -> Result<Vec<model::Task>, types::Error> {
-    let db_content = fs::read_to_string("src/data/db_test.json")?;
+    let db_content = fs::read_to_string(constants::DB_TEST_PATH)?;
     let parsed: Vec<model::Task> = serde_json::from_str(&db_content)?;
     Ok(parsed)
 }
