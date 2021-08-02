@@ -5,23 +5,24 @@ use tui::{
   widgets::{ Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table },
 };
 
+use crate::constants;
 use crate::data::task as data;
 
 pub fn render_home<'a>() -> Paragraph<'a> {
     let home = Paragraph::new(vec![
         Spans::from(vec![Span::raw("")]),
-        Spans::from(vec![Span::raw("Home of TODO TUI app")]),
+        Spans::from(vec![Span::raw(constants::HOME_DESCRIPTION_ROW_1)]),
         Spans::from(vec![Span::raw("")]),
-        Spans::from(vec![Span::raw("Add tasks for today!")]),
+        Spans::from(vec![Span::raw(constants::HOME_DESCRIPTION_ROW_2)]),
         Spans::from(vec![Span::raw("")]),
-        Spans::from(vec![Span::raw("Press 'q' to quit.")]),
+        Spans::from(vec![Span::raw(constants::HOME_DESCRIPTION_ROW_3)]),
     ])
     .alignment(Alignment::Center)
     .block(
         Block::default()
             .borders(Borders::ALL)
             .style(Style::default().fg(Color::White))
-            .title("Home")
+            .title(constants::HOME_PAGE_TITLE)
             .border_type(BorderType::Plain),
     );
     home
@@ -31,7 +32,7 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
     let tasks = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
-        .title(" Tasks ")
+        .title(constants::TASKS_PAGE_TITLE)
         .border_type(BorderType::Plain);
 
     let items: Vec<_> = task_list
@@ -67,15 +68,15 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
         ])])
         .header(Row::new(vec![
             Cell::from(Span::styled(
-                "Name",
+                constants::DETAIL_NAME_TITLE,
                 Style::default().add_modifier(Modifier::BOLD),
             )),
             Cell::from(Span::styled(
-                "Description",
+                constants::DETAIL_DESCRIPTION_TITLE,
                 Style::default().add_modifier(Modifier::BOLD),
             )),
             Cell::from(Span::styled(
-                "Created At",
+                constants::DETAIL_CREATED_AT_TITLE,
                 Style::default().add_modifier(Modifier::BOLD),
             )),
         ]))
@@ -83,7 +84,7 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
             Block::default()
                 .borders(Borders::ALL)
                 .style(Style::default().fg(Color::White))
-                .title(" Details ")
+                .title(constants::DETAILS_PAGE_TITLE)
                 .border_type(BorderType::Plain),
         )
         .widths(&[

@@ -26,7 +26,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    let menu_titles = vec!["Home", "Tasks", "Quit"];
+    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
     let mut current_page = types::Page::Home;
     let mut task_list_state = ListState::default();
     task_list_state.select(Some(0));
