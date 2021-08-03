@@ -19,3 +19,12 @@ pub enum Page {
     Home,
     Tasks,
 }
+
+impl From<Page> for usize {
+    fn from(input: Page) -> usize {
+        match input {
+            Page::Home => 0,
+            Page::Tasks => 2,
+        }
+    }
+}

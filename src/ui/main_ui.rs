@@ -26,7 +26,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
+    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::ADD_TASK_PAGE_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
     let mut current_page = types::Page::Home;
     let mut task_list_state = ListState::default();
     task_list_state.select(Some(0));
@@ -55,7 +55,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                       Span::styled(
                           first,
                           Style::default()
-                              .fg(Color::Yellow)
+                              .fg(Color::Cyan)
                               .add_modifier(Modifier::UNDERLINED),
                       ),
                       Span::styled(rest, Style::default().fg(Color::White)),
@@ -77,9 +77,10 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
           rect.render_widget(description, chunks[0]);
 
           let tabs = Tabs::new(menu)
+              .select(current_page.into())
               .block(Block::default().borders(Borders::ALL))
               .style(Style::default().fg(Color::White))
-              .highlight_style(Style::default().fg(Color::Yellow))
+              .highlight_style(Style::default().fg(Color::Cyan))
               .divider(Span::raw("|"));
 
           rect.render_widget(tabs, chunks[2]);

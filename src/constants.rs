@@ -6,6 +6,7 @@ pub const TASKS_TAB_TITLE: &str = "Tasks";
 pub const QUIT_TAB_TITLE: &str = "Quit";
 
 pub const HOME_PAGE_TITLE: &str = " Home ";
+pub const ADD_TASK_PAGE_TITLE: &str = "Add Task";
 pub const TASKS_PAGE_TITLE: &str = " Tasks ";
 pub const DETAILS_PAGE_TITLE: &str = " Details ";
 
