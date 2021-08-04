@@ -28,7 +28,7 @@ pub fn render_home<'a>() -> Paragraph<'a> {
     home
 }
 
-pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>) -> (List<'a>, Table<'a>) {
+pub fn render_tasks_side_bar<'a>(task_list: Vec<data::Task>) -> List<'a> {
     let tasks = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
@@ -47,11 +47,15 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
 
     let list = List::new(items).block(tasks).highlight_style(
         Style::default()
-            .bg(Color::Yellow)
-            .fg(Color::Black)
+            .bg(Color::Blue)
+            .fg(Color::White)
             .add_modifier(Modifier::BOLD),
     );
 
+    list
+}
+
+pub fn render_task_details<'a>(task_list_state: &ListState, task_list: Vec<data::Task>) -> Table<'a> {
     let selected_task = task_list
         .get(
             task_list_state
@@ -92,6 +96,15 @@ pub fn render_tasks<'a>(task_list_state: &ListState, task_list: Vec<data::Task>)
             Constraint::Percentage(40),
             Constraint::Percentage(10),
         ]);
+    task_detail
+}
 
-    (list, task_detail)
+pub fn render_add_task<'a>() -> Block<'a> {
+    let tasks = Block::default()
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::White))
+        .title(" Add Task ")
+        .border_type(BorderType::Plain);
+
+    tasks
 }

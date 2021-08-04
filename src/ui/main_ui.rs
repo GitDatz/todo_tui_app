@@ -87,6 +87,18 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
 
           match current_page {
               types::Page::Home => rect.render_widget(pages::render_home(), chunks[1]),
+              types::Page::AddTask => {
+                  let tasks_chunks = Layout::default()
+                      .direction(Direction::Horizontal)
+                      .constraints(
+                          [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+                      )
+                      .split(chunks[1]);
+                  let side_bar = pages::render_tasks_side_bar(presenter::read_test_db().expect("Could not parse database"));
+                  let task_details = pages::render_add_task();
+                  rect.render_widget(side_bar, tasks_chunks[0]);
+                  rect.render_widget(task_details, tasks_chunks[1]);
+              }
               types::Page::Tasks => {
                   let tasks_chunks = Layout::default()
                       .direction(Direction::Horizontal)
@@ -94,9 +106,10 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                           [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
                       )
                       .split(chunks[1]);
-                  let (side_bar, main_window) = pages::render_tasks(&task_list_state, presenter::read_test_db().expect("Could not parse database"));
+                  let side_bar = pages::render_tasks_side_bar(presenter::read_test_db().expect("Could not parse database"));
+                  let task_details = pages::render_task_details(&task_list_state, presenter::read_test_db().expect("Could not parse database"));
                   rect.render_stateful_widget(side_bar, tasks_chunks[0], &mut task_list_state);
-                  rect.render_widget(main_window, tasks_chunks[1]);
+                  rect.render_widget(task_details, tasks_chunks[1]);
               }
           }
         })?;
@@ -108,6 +121,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                     break;
                 }
                 KeyCode::Char('h') => current_page = types::Page::Home,
+                KeyCode::Char('a') => current_page = types::Page::AddTask,
                 KeyCode::Char('t') => current_page = types::Page::Tasks,
                 KeyCode::Down => {
                     if let Some(selected) = task_list_state.selected() {

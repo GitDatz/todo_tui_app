@@ -17,6 +17,7 @@ pub enum Event<I> {
 #[derive(Copy, Clone, Debug)]
 pub enum Page {
     Home,
+    AddTask,
     Tasks,
 }
 
@@ -24,6 +25,7 @@ impl From<Page> for usize {
     fn from(input: Page) -> usize {
         match input {
             Page::Home => 0,
+            Page::AddTask => 1,
             Page::Tasks => 2,
         }
     }
