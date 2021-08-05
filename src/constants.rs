@@ -1,9 +1,10 @@
 pub const APP_TITLE: &str = "TODO TUI - what to do today?";
 pub const DB_TEST_PATH: &str = "src/data/db_test.json";
 
-pub const HOME_TAB_TITLE: &str = "Home";
-pub const TASKS_TAB_TITLE: &str = "Tasks";
-pub const QUIT_TAB_TITLE: &str = "Quit";
+pub const HOME_TAB_TITLE: &str = "[H]ome";
+pub const ADD_TASK_TAB_TITLE: &str = "[A]dd Task";
+pub const TASKS_TAB_TITLE: &str = "[T]asks";
+pub const QUIT_TAB_TITLE: &str = "[Q]uit";
 
 pub const HOME_PAGE_TITLE: &str = " Home ";
 pub const ADD_TASK_PAGE_TITLE: &str = "Add Task";

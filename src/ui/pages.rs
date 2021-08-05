@@ -99,12 +99,21 @@ pub fn render_task_details<'a>(task_list_state: &ListState, task_list: Vec<data:
     task_detail
 }
 
-pub fn render_add_task<'a>() -> Block<'a> {
-    let tasks = Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default().fg(Color::White))
-        .title(" Add Task ")
-        .border_type(BorderType::Plain);
+pub fn render_add_task<'a>() -> Paragraph<'a> {
+    let name = "Name of task";
+    let add_task = Paragraph::new(vec![
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("Name:")]),
+        Spans::from(vec![Span::raw(name)]),
+    ])
+    .alignment(Alignment::Left)
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(Color::White))
+            .title(constants::ADD_TASK_PAGE_TITLE)
+            .border_type(BorderType::Plain)
+    );
 
-    tasks
+    add_task
 }

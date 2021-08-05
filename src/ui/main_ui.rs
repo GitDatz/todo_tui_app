@@ -7,7 +7,7 @@ use std::io;
 use tui::{
     backend::CrosstermBackend,
     layout::{ Alignment, Constraint, Direction, Layout },
-    style::{ Color, Modifier, Style },
+    style::{ Color, Style },
     text::{ Span, Spans },
     widgets::{ Block, BorderType, Borders, ListState, Paragraph, Tabs },
     Terminal,
@@ -26,7 +26,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::ADD_TASK_PAGE_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
+    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::ADD_TASK_TAB_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
     let mut current_page = types::Page::Home;
     let mut task_list_state = ListState::default();
     task_list_state.select(Some(0));
@@ -50,13 +50,12 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
           let menu = menu_titles
               .iter()
               .map(|t| {
-                  let (first, rest) = t.split_at(1);
+                  let (first, rest) = t.split_at(3);
                   Spans::from(vec![
                       Span::styled(
                           first,
                           Style::default()
                               .fg(Color::Cyan)
-                              .add_modifier(Modifier::UNDERLINED),
                       ),
                       Span::styled(rest, Style::default().fg(Color::White)),
                   ])
