@@ -1,7 +1,9 @@
+use chrono::Utc;
 use crossterm::{
     event::{ self, Event as CtEvent },
 };
 use std::fs;
+use std::io;
 use std::sync::mpsc;
 use std::thread;
 use std::time::{ Duration, Instant };
@@ -11,7 +13,26 @@ use crate::data::task as model;
 use crate::types;
 use crate::ui;
 
-pub fn presenter() {
+pub fn presenter(arg: &str) {
+    if arg.eq("add") {
+      add_task();
+    }
+    else {
+      start_main_application();
+    }
+}
+
+pub fn add_task() {
+    let mut name = String::new();
+    let mut description = String::new();
+    println!("Task Name");
+    io::stdin().read_line(&mut name).expect("failed to read_line");
+    println!("Task Description");
+    io::stdin().read_line(&mut description).expect("failed to read_line");
+    add_task_to_db(name, description).expect("could not add task to database");
+}
+
+pub fn start_main_application() {
     let (sender, receiver) = mpsc::channel();
     let tick_rate = Duration::from_millis(200);
 
@@ -36,6 +57,19 @@ pub fn presenter() {
         }
     });
     ui::main_ui::render_main_ui(receiver).expect("render main ui");
+}
+
+pub fn add_task_to_db(name: String, description: String) -> Result<Vec<model::Task>, types::Error> {
+    let db_content = fs::read_to_string(constants::DB_TEST_PATH)?;
+    let mut parsed: Vec<model::Task> = serde_json::from_str(&db_content)?;
+    let new_task = model::Task {
+        name: name,
+        description: description,
+        date_added: Utc::now(),
+    };
+    parsed.push(new_task);
+    fs::write(constants::DB_TEST_PATH, &serde_json::to_vec(&parsed)?)?;
+    Ok(parsed)
 }
 
 pub fn read_test_db() -> Result<Vec<model::Task>, types::Error> {

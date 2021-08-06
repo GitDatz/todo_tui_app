@@ -1,3 +1,5 @@
+use std::env;
+
 mod constants;
 mod data;
 mod ui;
@@ -6,5 +8,11 @@ mod types;
 
 
 fn main() {
-    presenter::presenter();
+    let args: Vec<String> = env::args().collect();
+    if args.len() > 1 {
+        presenter::presenter(&args[1]);
+    }
+    else {
+        presenter::presenter("");
+    }
 }

@@ -100,11 +100,13 @@ pub fn render_task_details<'a>(task_list_state: &ListState, task_list: Vec<data:
 }
 
 pub fn render_add_task<'a>() -> Paragraph<'a> {
-    let name = "Name of task";
+    let mut name = String::new();
+    println!("Enter Task name:");
+    let b1 = std::io::stdin().read_line(&mut name).unwrap();
     let add_task = Paragraph::new(vec![
         Spans::from(vec![Span::raw("")]),
         Spans::from(vec![Span::raw("Name:")]),
-        Spans::from(vec![Span::raw(name)]),
+        Spans::from(vec![Span::raw(b1.to_string())]),
     ])
     .alignment(Alignment::Left)
     .block(
