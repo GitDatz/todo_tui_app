@@ -26,7 +26,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::ADD_TASK_TAB_TITLE, constants::TASKS_TAB_TITLE, constants::QUIT_TAB_TITLE];
+    let menu_titles = vec![constants::HOME_TAB_TITLE, constants::ADD_TASK_TAB_TITLE, constants::TASKS_TAB_TITLE, constants::DELETE_TASK_TAB_TITLE, constants::QUIT_TAB_TITLE];
     let mut current_page = types::Page::Home;
     let mut task_list_state = ListState::default();
     task_list_state.select(Some(0));
@@ -93,7 +93,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                           [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
                       )
                       .split(chunks[1]);
-                  let side_bar = pages::render_tasks_side_bar(presenter::read_test_db().expect("Could not parse database"));
+                  let side_bar = pages::render_tasks_side_bar(presenter::read_db().expect("Could not parse database"));
                   let task_details = pages::render_add_task();
                   rect.render_widget(side_bar, tasks_chunks[0]);
                   rect.render_widget(task_details, tasks_chunks[1]);
@@ -105,8 +105,8 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                           [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
                       )
                       .split(chunks[1]);
-                  let side_bar = pages::render_tasks_side_bar(presenter::read_test_db().expect("Could not parse database"));
-                  let task_details = pages::render_task_details(&task_list_state, presenter::read_test_db().expect("Could not parse database"));
+                  let side_bar = pages::render_tasks_side_bar(presenter::read_db().expect("Could not parse database"));
+                  let task_details = pages::render_task_details(&task_list_state, presenter::read_db().expect("Could not parse database"));
                   rect.render_stateful_widget(side_bar, tasks_chunks[0], &mut task_list_state);
                   rect.render_widget(task_details, tasks_chunks[1]);
               }
@@ -122,9 +122,10 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                 KeyCode::Char('h') => current_page = types::Page::Home,
                 KeyCode::Char('a') => current_page = types::Page::AddTask,
                 KeyCode::Char('t') => current_page = types::Page::Tasks,
+                KeyCode::Char('d') => presenter::delete_task_from_db(&mut task_list_state).expect("delete task from db"),
                 KeyCode::Down => {
                     if let Some(selected) = task_list_state.selected() {
-                        let nr_of_tasks = presenter::read_test_db().expect("can not fetch tasks list").len();
+                        let nr_of_tasks = presenter::read_db().expect("can not fetch tasks list").len();
                         if selected >= nr_of_tasks - 1 {
                             task_list_state.select(Some(0));
                         } else {
@@ -134,7 +135,7 @@ pub fn render_main_ui(receiver: std::sync::mpsc::Receiver<types::Event<crossterm
                 }
                 KeyCode::Up => {
                     if let Some(selected) = task_list_state.selected() {
-                        let nr_of_tasks = presenter::read_test_db().expect("can not fetch tasks list").len();
+                        let nr_of_tasks = presenter::read_db().expect("can not fetch tasks list").len();
                         if selected > 0 {
                             task_list_state.select(Some(selected - 1));
                         } else {

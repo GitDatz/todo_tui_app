@@ -94,7 +94,7 @@ pub fn render_task_details<'a>(task_list_state: &ListState, task_list: Vec<data:
         .widths(&[
             Constraint::Percentage(30),
             Constraint::Percentage(40),
-            Constraint::Percentage(10),
+            Constraint::Percentage(20),
         ]);
     task_detail
 }

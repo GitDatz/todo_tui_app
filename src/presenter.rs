@@ -7,6 +7,7 @@ use std::io;
 use std::sync::mpsc;
 use std::thread;
 use std::time::{ Duration, Instant };
+use tui::widgets::ListState;
 
 use crate::constants;
 use crate::data::task as model;
@@ -72,8 +73,19 @@ pub fn add_task_to_db(name: String, description: String) -> Result<Vec<model::Ta
     Ok(parsed)
 }
 
-pub fn read_test_db() -> Result<Vec<model::Task>, types::Error> {
+pub fn read_db() -> Result<Vec<model::Task>, types::Error> {
     let db_content = fs::read_to_string(constants::DB_TEST_PATH)?;
     let parsed: Vec<model::Task> = serde_json::from_str(&db_content)?;
     Ok(parsed)
+}
+
+pub fn delete_task_from_db(task_list_state: &mut ListState) -> Result<(), types::Error> {
+    if let Some(selected) = task_list_state.selected() {
+        let db_content = fs::read_to_string(constants::DB_TEST_PATH)?;
+        let mut parsed: Vec<model::Task> = serde_json::from_str(&db_content)?;
+        parsed.remove(selected);
+        fs::write(constants::DB_TEST_PATH, &serde_json::to_vec(&parsed)?)?;
+        task_list_state.select(Some(selected - 1));
+    }
+    Ok(())
 }

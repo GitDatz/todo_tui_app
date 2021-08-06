@@ -4,6 +4,7 @@ pub const DB_TEST_PATH: &str = "src/data/db_test.json";
 pub const HOME_TAB_TITLE: &str = "[H]ome";
 pub const ADD_TASK_TAB_TITLE: &str = "[A]dd Task";
 pub const TASKS_TAB_TITLE: &str = "[T]asks";
+pub const DELETE_TASK_TAB_TITLE: &str = "[D]elete Task";
 pub const QUIT_TAB_TITLE: &str = "[Q]uit";
 
 pub const HOME_PAGE_TITLE: &str = " Home ";
